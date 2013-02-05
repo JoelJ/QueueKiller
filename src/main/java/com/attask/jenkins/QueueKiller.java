@@ -21,21 +21,7 @@ import java.util.*;
 @Extension
 public class QueueKiller extends Queue.QueueDecisionHandler {
 	public boolean shouldSchedule(Queue.Task toBeQueuedTask, List<Action> actions) {
-		QueueKillerProperty property = null;
-		if(!(toBeQueuedTask instanceof BuildableItemWithBuildWrappers)) {
-			return true; // It's configured through BuildWrappers, so this is required.
-		} else {
-			BuildableItemWithBuildWrappers toBeQueuedProject = (BuildableItemWithBuildWrappers)toBeQueuedTask;
-			DescribableList<BuildWrapper,Descriptor<BuildWrapper>> buildWrappersList = toBeQueuedProject.getBuildWrappersList();
-
-			for (BuildWrapper buildWrapper : buildWrappersList) {
-				if(buildWrapper instanceof QueueKillerProperty) {
-					property = (QueueKillerProperty) buildWrapper;
-					break;
-				}
-			}
-		}
-
+		QueueKillerProperty property = QueueItemUtils.getQueueKillerProperty(toBeQueuedTask);
 		if(property == null) {
 			return true;
 		}
