@@ -16,7 +16,11 @@ public class QueueMap {
 	//          Proj        ParamName    ParamValue
 	private Map<String, Map<String, Map<String, List<Queue.Item>>>> map;
 
-	public QueueMap(List<Queue.Item> queue) {
+	public static QueueMap getQueue() {
+		return new QueueMap(Arrays.asList(Queue.getInstance().getItems()));
+	}
+
+	private QueueMap(List<Queue.Item> queue) {
 		map = new HashMap<String, Map<String, Map<String, List<Queue.Item>>>>();
 		populateMap(queue);
 	}

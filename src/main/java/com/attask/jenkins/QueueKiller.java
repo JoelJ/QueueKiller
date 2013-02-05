@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import hudson.Extension;
 import hudson.model.*;
 import hudson.model.Queue;
-import hudson.tasks.BuildWrapper;
-import hudson.util.DescribableList;
 
 import java.util.*;
 
@@ -30,7 +28,7 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 		//		So this will stay as a list to make it easy to make that change in the future.
 		List<QueueKillerProperty> configurationList = Arrays.asList(property);
 
-		QueueMap queueMap = new QueueMap(Arrays.asList(Queue.getInstance().getItems()));
+		QueueMap queueMap = QueueMap.getQueue();
 		Map<String, StringParameterValue> toBeQueuedParameters = createParameterMap(actions);
 
 		for (QueueKillerProperty configuration : configurationList) {
