@@ -1,3 +1,3 @@
 <div>
-  Keeps the queue clean when resources are tight.
+  Keeps the queue clean based on custom parameters (such as only allowing only one job per branch) when resources are tight.
 </div>

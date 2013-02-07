@@ -1,0 +1,54 @@
+<div>
+	<div>The parameters you want to keep when a build is throttled and removed from the queue.</div>
+
+	<div>
+		For example: say your build is triggered by an SCM hook which passes in the commit range that will be run.
+		When an older build is throttled and removed from the queue, you don't want to lose the bottom number of the
+		range to be run.
+		So would specify the OLD_REV value here, to keep the oldest OLD_REV.
+	</div>
+
+	<div>
+		Example configuration. Job parameters:
+		<ul>
+			<li>ID</li>
+			<li>BRANCH</li>
+			<li>OLD_REV</li>
+			<li>NEW_REV</li>
+		</ul>
+		A job is triggered with the following values and starts running:
+		<ul>
+			<li>ID: 1</li>
+			<li>BRANCH: master</li>
+			<li>OLD_REV: 1</li>
+			<li>NEW_REV: 2</li>
+		</ul>
+		Another job gets scheduled:
+		<ul>
+			<li>ID: 2</li>
+			<li>BRANCH: master</li>
+			<li>OLD_REV: 2</li>
+			<li>NEW_REV: 3</li>
+		</ul>
+		but the BRANCH value is being throttled, so it sits in the queue. <br/>
+
+		And then once more another job is scheduled:
+		<ul>
+			<li>ID: 3</li>
+			<li>BRANCH: master</li>
+			<li>OLD_REV: 3</li>
+			<li>NEW_REV: 4</li>
+		</ul>
+		However, the queue is throttling, so job with ID "2" will be canceled. However, OLD_REV is set to be copied.
+		So the build with ID: "3" will change it's OLD_REV to be the same value of OLD_REV of ID "2",
+		the build with ID "2" will be canceled, and the build with ID "3" would end up looking like this:
+		<ul>
+			<li>ID: 3</li>
+			<li>BRANCH: master</li>
+			<li>OLD_REV: 2</li>
+			<li>NEW_REV: 4</li>
+		</ul>
+		This is especially useful if your <a target="_blank" href="https://github.com/JoelJ/SimpleGit/blob/master/README.md">SCM plugin</a>
+		allows you to specify the commit range for generating the Change History.
+	</div>
+</div>
