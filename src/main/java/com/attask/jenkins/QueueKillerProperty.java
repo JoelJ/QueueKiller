@@ -19,18 +19,26 @@ import java.util.Set;
  */
 public class QueueKillerProperty extends BuildWrapper {
 	private final int numberAllowedInQueue;
+	private final int numberAllowedToRun;
 	private final String checkedValues;
 	private final String valuesToCopy;
+	private final int passThreshold;
 
 	@DataBoundConstructor
-	public QueueKillerProperty(int numberAllowedInQueue, String checkedValues, String valuesToCopy) {
+	public QueueKillerProperty(int numberAllowedInQueue, int numberAllowedToRun, String checkedValues, String valuesToCopy, int passThreshold) {
 		this.numberAllowedInQueue = numberAllowedInQueue <= 0 ? 1 : numberAllowedInQueue;
+		this.numberAllowedToRun = numberAllowedToRun < 0 ? 0 : numberAllowedToRun; //Zero means infinite
 		this.checkedValues = fixNull(checkedValues);
 		this.valuesToCopy = fixNull(valuesToCopy);
+		this.passThreshold = passThreshold <= 0 ? 10 : passThreshold;
 	}
 
 	public int getNumberAllowedInQueue() {
 		return numberAllowedInQueue;
+	}
+
+	public int getNumberAllowedToRun() {
+		return numberAllowedToRun;
 	}
 
 	public String getCheckedValues() {
@@ -39,6 +47,10 @@ public class QueueKillerProperty extends BuildWrapper {
 
 	public String getValuesToCopy() {
 		return valuesToCopy;
+	}
+
+	public int getPassThreshold() {
+		return passThreshold;
 	}
 
 	public Set<String> createCheckedValuesSet() {
