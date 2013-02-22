@@ -101,7 +101,7 @@ public class QueueKillerDispatcher extends QueueTaskDispatcher {
 	private Map<String, StringParameterValue> getThrottledParameters(Actionable item, Collection<String> configuration) {
 		Map<String, StringParameterValue> result = new HashMap<String, StringParameterValue>(configuration.size());
 
-		List<ParametersAction> actions = item.getActions(ParametersAction.class);
+		List<ParametersAction> actions = ActionableUtils.getActions(item, ParametersAction.class);
 		for (ParametersAction action : actions) {
 			for (String paramName : configuration) {
 				ParameterValue parameter = action.getParameter(paramName);

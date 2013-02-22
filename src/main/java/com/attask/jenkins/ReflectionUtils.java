@@ -24,4 +24,17 @@ public class ReflectionUtils {
 			throw new RuntimeException("This shouldn't happen because value is a public field", e);
 		}
 	}
+
+	public static <T> T getValue(Class<?> objectClass, Object objectInstance, String fieldName) {
+		try {
+			Field field = objectClass.getField(fieldName);
+			field.setAccessible(true);
+			Object result = field.get(objectInstance);
+			return (T)result;
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

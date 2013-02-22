@@ -69,11 +69,13 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 
 	private List<StringParameterValue> findParametersToCopy(Queue.Item toRemove, Set<String> valuesToCopySet) {
 		ImmutableList.Builder<StringParameterValue> builder = ImmutableList.builder();
-		ParametersAction action = toRemove.getAction(ParametersAction.class);
-		for (String valueToCopy : valuesToCopySet) {
-			ParameterValue parameter = action.getParameter(valueToCopy);
-			if(parameter != null && parameter instanceof StringParameterValue) {
-				builder.add((StringParameterValue) parameter);
+		ParametersAction action = ActionableUtils.getAction(toRemove, ParametersAction.class);
+		if(action != null) {
+			for (String valueToCopy : valuesToCopySet) {
+				ParameterValue parameter = action.getParameter(valueToCopy);
+				if(parameter != null && parameter instanceof StringParameterValue) {
+					builder.add((StringParameterValue) parameter);
+				}
 			}
 		}
 		return builder.build();

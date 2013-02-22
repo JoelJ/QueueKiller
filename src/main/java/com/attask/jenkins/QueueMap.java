@@ -79,7 +79,7 @@ public class QueueMap {
 			Queue.Task task = queueItem.task;
 			String projectName = task.getName();
 			if(task instanceof Actionable) {
-				List<ParametersAction> actions = queueItem.getActions(ParametersAction.class);
+				List<ParametersAction> actions = ActionableUtils.getActions(queueItem, ParametersAction.class);
 				for (ParametersAction action : actions) {
 					List<ParameterValue> parameters = action.getParameters();
 					for (ParameterValue parameter : parameters) {
