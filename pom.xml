@@ -1,6 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>1.502</version>
+	</parent>
+
+	<groupId>com.attask.jenkins</groupId>
+	<artifactId>QueueKiller</artifactId>
+	<version>1.3-SNAPSHOT</version>
+	<packaging>hpi</packaging>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -8,16 +19,6 @@
 			<version>12.0</version>
 		</dependency>
 	</dependencies>
-	<parent>
-		<groupId>org.jenkins-ci.plugins</groupId>
-		<artifactId>plugin</artifactId>
-		<version>1.466</version>
-	</parent>
-
-	<groupId>com.attask.jenkins</groupId>
-	<artifactId>QueueKiller</artifactId>
-	<version>1.2-SNAPSHOT</version>
-	<packaging>hpi</packaging>
 
 	<repositories>
 		<repository>

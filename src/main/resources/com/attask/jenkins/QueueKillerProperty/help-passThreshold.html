@@ -1,0 +1,13 @@
+<div>
+	<p>
+		Used as a short-circuit to prevent iterating more finished builds than we need to.
+		This is the number of finished builds allowed in a row before it is assumed there are no more running jobs.
+	</p>
+	<p>
+		If you find that you only ever have 3 finished jobs in between running jobs, this value should be 3 or 4.
+		However, if you find that you often have a lot of newer builds finish before older jobs, this should be a higher value.
+	</p>
+	<p>
+		The default is 10.
+	</p>
+</div>

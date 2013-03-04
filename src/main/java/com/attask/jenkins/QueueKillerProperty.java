@@ -24,13 +24,16 @@ public class QueueKillerProperty extends BuildWrapper {
 	private final String valuesToCopy;
 	private final int passThreshold;
 
+	private final int maxTotalRuns;
+
 	@DataBoundConstructor
-	public QueueKillerProperty(int numberAllowedInQueue, int numberAllowedToRun, String checkedValues, String valuesToCopy, int passThreshold) {
+	public QueueKillerProperty(int numberAllowedInQueue, int numberAllowedToRun, String checkedValues, String valuesToCopy, int passThreshold, int maxTotalRuns) {
 		this.numberAllowedInQueue = numberAllowedInQueue <= 0 ? 1 : numberAllowedInQueue;
 		this.numberAllowedToRun = numberAllowedToRun < 0 ? 0 : numberAllowedToRun; //Zero means infinite
 		this.checkedValues = fixNull(checkedValues);
 		this.valuesToCopy = fixNull(valuesToCopy);
 		this.passThreshold = passThreshold <= 0 ? 10 : passThreshold;
+		this.maxTotalRuns = maxTotalRuns;
 	}
 
 	public int getNumberAllowedInQueue() {
@@ -51,6 +54,10 @@ public class QueueKillerProperty extends BuildWrapper {
 
 	public int getPassThreshold() {
 		return passThreshold;
+	}
+
+	public int getMaxTotalRuns() {
+		return maxTotalRuns;
 	}
 
 	public Set<String> createCheckedValuesSet() {

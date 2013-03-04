@@ -8,7 +8,15 @@
 	<f:entry title="Parameters to Match" field="checkedValues">
 		<f:textbox />
 	</f:entry>
-	<f:entry title="Parameters to Copy" field="valuesToCopy">
-		<f:textarea />
-	</f:entry>
+	<f:advanced>
+		<f:entry title="Parameters to Copy" field="valuesToCopy">
+			<f:textarea />
+		</f:entry>
+		<f:entry title="Maximum number of runs" default="0" field="maxTotalRuns" description="This is the total number of runs this job can run regardless of the parameters. Use 0 for 'infinite'.">
+			<f:textbox />
+		</f:entry>
+		<f:entry title="Finished Threshold" default="10" field="passThreshold">
+			<f:textbox />
+		</f:entry>
+	</f:advanced>
 </j:jelly>

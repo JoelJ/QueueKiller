@@ -51,15 +51,29 @@ public class QueueKillerDispatcher extends QueueTaskDispatcher {
 		}
 
 		AbstractProject projectToRun = (AbstractProject)queueItemToBeRun.task;
-		List<Run> builds = (List<Run>)projectToRun.getBuilds();
+
+		int maxNumberAllowedToRun = configuration.getMaxTotalRuns();
+
+		RunList builds = projectToRun.getBuilds();
 
 		//The threshold is how many FINISHED builds we run into in a row before we assume there are no more running builds.
 		final int maxThreshold = configuration.getPassThreshold();
 		int threshold = 0;
 
+		int totalRunning = 0;
 		int matches = 0;
-		for (Run build : builds) {
+
+		for (Object buildObject : builds) {
+			if(!(buildObject instanceof Run)) {
+				log.warning(buildObject + " is not an instance of " + Run.class.getCanonicalName());
+				continue;
+			}
+
+			Run build = (Run)buildObject;
 			if(build.isBuilding()) {
+				if(maxNumberAllowedToRun > 0 && ++totalRunning >= maxNumberAllowedToRun) {
+					return new ThrottleCauseOfBlockage("Only " + maxNumberAllowedToRun + " jobs of project " + projectToRun.getDisplayName() + " is allowed to run at any given time.");
+				}
 				threshold = 0;
 				Map<String, StringParameterValue> alreadyBuiltThrottledParameters = getThrottledParameters(build, toRunThrottledParameters.keySet());
 				if(alreadyBuiltThrottledParameters.size() > 0) {
