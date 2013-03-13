@@ -9,6 +9,8 @@ import hudson.model.Queue;
 import java.util.*;
 
 /**
+ * Prevents too many throttled items from being in the queue.
+ *
  * Checks the parameters used to start a build and limits the number of builds in the queue that match user-specified values.
  * It will always keep the newest builds in the queue.
  *

@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Prevents items that are currently in the queue from running if they're being throttled.
+ *
  * User: Joel Johnson
  * Date: 2/5/13
  * Time: 8:36 AM
