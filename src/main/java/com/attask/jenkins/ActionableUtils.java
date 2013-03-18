@@ -23,8 +23,14 @@ public class ActionableUtils {
 	}
 
 	public static <T extends Action> List<T> getActions(Actionable actionable, Class<T> type) {
+		List<Action> actions = getActions(actionable);
+		return filterActions(actions, type);
+	}
+
+	public static <T extends Action> List<T> filterActions(List<Action> actions, Class<T> type) {
 		ImmutableList.Builder<T> builder = ImmutableList.builder();
-		for (Action a : getActions(actionable)) {
+
+		for (Action a : actions) {
 			if (type.isInstance(a)) {
 				builder.add(type.cast(a));
 			}
@@ -32,11 +38,13 @@ public class ActionableUtils {
 		return builder.build();
 	}
 
-	public static <T extends Action> T getAction(Actionable actionable, Class<T> type) {
-		List<T> actions = getActions(actionable, type);
-		if(actions == null || actions.isEmpty()) {
-			return null;
+	public static <T extends Action> T filterAction(List<Action> actions, Class<T> type) {
+		for (Action a : actions) {
+			if (type.isInstance(a)) {
+				return type.cast(a);
+			}
 		}
-		return actions.get(0);
+
+		return null;
 	}
 }

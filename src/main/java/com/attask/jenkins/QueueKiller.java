@@ -10,19 +10,19 @@ import java.util.*;
 
 /**
  * Prevents too many throttled items from being in the queue.
- *
+ * <p/>
  * Checks the parameters used to start a build and limits the number of builds in the queue that match user-specified values.
  * It will always keep the newest builds in the queue.
- *
+ * <p/>
  * User: Joel Johnson
  * Date: 2/4/13
  * Time: 7:37 PM
  */
 @Extension
 public class QueueKiller extends Queue.QueueDecisionHandler {
-	public boolean shouldSchedule(Queue.Task toBeQueuedTask, List<Action> actions) {
+	public boolean shouldSchedule(Queue.Task toBeQueuedTask, List<Action> toBeQueuedActions) {
 		QueueKillerProperty property = QueueItemUtils.getQueueKillerProperty(toBeQueuedTask);
-		if(property == null) {
+		if (property == null) {
 			return true;
 		}
 
@@ -31,7 +31,7 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 		List<QueueKillerProperty> configurationList = Arrays.asList(property);
 
 		QueueMap queueMap = QueueMap.getQueue();
-		Map<String, StringParameterValue> toBeQueuedParameters = createParameterMap(actions);
+		Map<String, StringParameterValue> toBeQueuedParameters = createParameterMap(toBeQueuedActions);
 
 		for (QueueKillerProperty configuration : configurationList) {
 			Set<String> checkedValuesSet = configuration.createCheckedValuesSet();
@@ -39,16 +39,14 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 
 			for (String checkedParameterName : checkedValuesSet) {
 				StringParameterValue parameter = toBeQueuedParameters.get(checkedParameterName);
-				if(parameter != null) {
+				if (parameter != null) {
 					List<Queue.Item> queueItems = queueMap.getQueueItems(toBeQueuedTask.getName(), checkedParameterName, parameter.value);
-					if(queueItems != null) {
-						List<Queue.Item> queuedItems = new LinkedList<Queue.Item>(queueItems);
-						while(queuedItems.size() >= configuration.getNumberAllowedInQueue()) {
-							Queue.Item toCancel = queuedItems.remove(0); //The list is sorted. Top of the list is the one to be removed
-							Queue.getInstance().cancel(toCancel);
-							List<StringParameterValue> parametersToCopy = findParametersToCopy(toCancel, valuesToCopySet);
-							swapParameterValues(toBeQueuedParameters, parametersToCopy);
-						}
+					if (queueItems != null && queueItems.size() >= configuration.getNumberAllowedInQueue()) {
+						List<StringParameterValue> parametersToCopy = findParametersToCopy(toBeQueuedActions, valuesToCopySet);
+						Queue.Item alreadyQueued = queueItems.get(0); //The list is sorted. Top of the list is the one to be removed
+						copyParameters(alreadyQueued, parametersToCopy);
+
+						return false;
 					}
 				}
 			}
@@ -57,25 +55,27 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 		return true;
 	}
 
-	private void swapParameterValues(Map<String, StringParameterValue> parametersToChange, List<StringParameterValue> parametersToCopy) {
+	private void copyParameters(Actionable actionable, List<StringParameterValue> parametersToCopy) {
+		ParametersAction action = actionable.getAction(ParametersAction.class);
+
 		for (StringParameterValue parameterToCopy : parametersToCopy) {
-			String parameterToCopyName = parameterToCopy.getName();
-			String parameterToCopyValue = parameterToCopy.value;
-			StringParameterValue parameterToChange = parametersToChange.get(parameterToCopyName);
-			if(parameterToChange != null) {
-				ReflectionUtils.setValue(parameterToChange, parameterToCopyValue);
+			String newValue = parameterToCopy.value;
+
+			ParameterValue parameterToHack = action.getParameter(parameterToCopy.getName());
+			if(parameterToHack instanceof StringParameterValue) {
+				ReflectionUtils.setValue((StringParameterValue) parameterToHack, newValue);
 			}
 		}
 	}
 
 
-	private List<StringParameterValue> findParametersToCopy(Queue.Item toRemove, Set<String> valuesToCopySet) {
+	private List<StringParameterValue> findParametersToCopy(List<Action> actions, Set<String> valuesToCopySet) {
 		ImmutableList.Builder<StringParameterValue> builder = ImmutableList.builder();
-		ParametersAction action = ActionableUtils.getAction(toRemove, ParametersAction.class);
-		if(action != null) {
+		ParametersAction action = ActionableUtils.filterAction(actions, ParametersAction.class);
+		if (action != null) {
 			for (String valueToCopy : valuesToCopySet) {
 				ParameterValue parameter = action.getParameter(valueToCopy);
-				if(parameter != null && parameter instanceof StringParameterValue) {
+				if (parameter != null && parameter instanceof StringParameterValue) {
 					builder.add((StringParameterValue) parameter);
 				}
 			}
@@ -83,15 +83,15 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 		return builder.build();
 	}
 
-	private static Map<String, StringParameterValue> createParameterMap(List<Action> actions) {
+	private static Map<String, StringParameterValue> createParameterMap(Iterable<? extends Action> actions) {
 		ImmutableMap.Builder<String, StringParameterValue> builder = ImmutableMap.builder();
 
-		if(actions != null) {
+		if (actions != null) {
 			for (Action action : actions) {
-				if(action instanceof ParametersAction) {
-					for (ParameterValue parameterValue : ((ParametersAction)action).getParameters()) {
-						if(parameterValue instanceof StringParameterValue) {
-							builder.put(parameterValue.getName(), (StringParameterValue)parameterValue);
+				if (action instanceof ParametersAction) {
+					for (ParameterValue parameterValue : ((ParametersAction) action).getParameters()) {
+						if (parameterValue instanceof StringParameterValue) {
+							builder.put(parameterValue.getName(), (StringParameterValue) parameterValue);
 						}
 					}
 				}
