@@ -1,6 +1,7 @@
 package com.attask.jenkins;
 
 import com.google.common.collect.ImmutableSet;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.*;
@@ -18,8 +19,8 @@ import java.util.Set;
  * Time: 10:49 PM
  */
 public class QueueKillerProperty extends BuildWrapper {
-	private final int numberAllowedInQueue;
-	private final int numberAllowedToRun;
+	private final String numberAllowedInQueue;
+	private final String numberAllowedToRun;
 	private final String checkedValues;
 	private final String valuesToCopy;
 	private final int passThreshold;
@@ -27,20 +28,20 @@ public class QueueKillerProperty extends BuildWrapper {
 	private final int maxTotalRuns;
 
 	@DataBoundConstructor
-	public QueueKillerProperty(int numberAllowedInQueue, int numberAllowedToRun, String checkedValues, String valuesToCopy, int passThreshold, int maxTotalRuns) {
-		this.numberAllowedInQueue = numberAllowedInQueue <= 0 ? 1 : numberAllowedInQueue;
-		this.numberAllowedToRun = numberAllowedToRun < 0 ? 0 : numberAllowedToRun; //Zero means infinite
+	public QueueKillerProperty(String numberAllowedInQueue, String numberAllowedToRun, String checkedValues, String valuesToCopy, int passThreshold, int maxTotalRuns) {
+		this.numberAllowedInQueue = numberAllowedInQueue;
+		this.numberAllowedToRun = numberAllowedToRun; //Zero means infinite
 		this.checkedValues = fixNull(checkedValues);
 		this.valuesToCopy = fixNull(valuesToCopy);
 		this.passThreshold = passThreshold <= 0 ? 10 : passThreshold;
 		this.maxTotalRuns = maxTotalRuns;
 	}
 
-	public int getNumberAllowedInQueue() {
+	public String getNumberAllowedInQueue() {
 		return numberAllowedInQueue;
 	}
 
-	public int getNumberAllowedToRun() {
+	public String getNumberAllowedToRun() {
 		return numberAllowedToRun;
 	}
 
@@ -58,6 +59,22 @@ public class QueueKillerProperty extends BuildWrapper {
 
 	public int getMaxTotalRuns() {
 		return maxTotalRuns;
+	}
+
+	public int expandNumberAllowedInQueue(EnvVars environment) {
+		String toParse = getNumberAllowedInQueue();
+		if(environment != null) {
+			toParse = environment.expand(toParse);
+		}
+		return Integer.parseInt(toParse);
+	}
+
+	public int expandNumberAllowedToRun(EnvVars environment) {
+		String toParse = getNumberAllowedToRun();
+		if(environment != null) {
+			toParse = environment.expand(toParse);
+		}
+		return Integer.parseInt(toParse);
 	}
 
 	public Set<String> createCheckedValuesSet() {

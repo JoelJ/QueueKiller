@@ -2,6 +2,7 @@ package com.attask.jenkins;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.*;
 import hudson.model.Queue;
@@ -33,6 +34,8 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 		QueueMap queueMap = QueueMap.getQueue();
 		Map<String, StringParameterValue> toBeQueuedParameters = createParameterMap(toBeQueuedActions);
 
+		EnvVars envVars = QueueItemUtils.createEnvVarsForProject(toBeQueuedTask);
+
 		for (QueueKillerProperty configuration : configurationList) {
 			Set<String> checkedValuesSet = configuration.createCheckedValuesSet();
 			Set<String> valuesToCopySet = configuration.createValuesToCopySet();
@@ -41,7 +44,7 @@ public class QueueKiller extends Queue.QueueDecisionHandler {
 				StringParameterValue parameter = toBeQueuedParameters.get(checkedParameterName);
 				if (parameter != null) {
 					List<Queue.Item> queueItems = queueMap.getQueueItems(toBeQueuedTask.getName(), checkedParameterName, parameter.value);
-					if (queueItems != null && queueItems.size() >= configuration.getNumberAllowedInQueue()) {
+					if (queueItems != null && queueItems.size() >= configuration.expandNumberAllowedInQueue(envVars)) {
 						List<StringParameterValue> parametersToCopy = findParametersToCopy(toBeQueuedActions, valuesToCopySet);
 						Queue.Item alreadyQueued = queueItems.get(0); //The list is sorted. Top of the list is the one to be removed
 						copyParameters(alreadyQueued, parametersToCopy);

@@ -9,7 +9,7 @@
 
 	<groupId>com.attask.jenkins</groupId>
 	<artifactId>QueueKiller</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.5-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
 	<dependencies>

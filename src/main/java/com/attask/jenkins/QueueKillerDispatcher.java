@@ -1,5 +1,6 @@
 package com.attask.jenkins;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.*;
 import hudson.model.Queue;
@@ -37,7 +38,10 @@ public class QueueKillerDispatcher extends QueueTaskDispatcher {
 			return null; // Not configured to be throttled, don't throttle it. Null means "good to go". Awkward.
 		}
 
-		int numberAllowedToRun = configuration.getNumberAllowedToRun();
+		AbstractProject projectToRun = (AbstractProject) taskToBeRun;
+		EnvVars envVars = QueueItemUtils.createEnvVarsForProject(projectToRun);
+
+		int numberAllowedToRun = configuration.expandNumberAllowedToRun(envVars);
 		if(numberAllowedToRun <= 0) {
 			return null;
 		}
@@ -51,8 +55,6 @@ public class QueueKillerDispatcher extends QueueTaskDispatcher {
 		if(toRunThrottledParameters.size() <= 0) {
 			return null;
 		}
-
-		AbstractProject projectToRun = (AbstractProject)queueItemToBeRun.task;
 
 		int maxNumberAllowedToRun = configuration.getMaxTotalRuns();
 
@@ -86,14 +88,14 @@ public class QueueKillerDispatcher extends QueueTaskDispatcher {
 							if(toRunParameter.value == null) {
 								if(alreadyBuiltParameter.value == null) {
 									matches++;
-									if(matches >= configuration.getNumberAllowedToRun()) {
+									if(matches >= configuration.expandNumberAllowedToRun(envVars)) {
 										return new ThrottleCauseOfBlockage("Only allowed " + configuration.getNumberAllowedToRun() + " for:\n" + configuration.getCheckedValues());
 									}
 									break;
 								}
 							} else if(toRunParameter.value.equals(alreadyBuiltParameter.value)) {
 								matches++;
-								if(matches >= configuration.getNumberAllowedToRun()) {
+								if(matches >= configuration.expandNumberAllowedToRun(envVars)) {
 									return new ThrottleCauseOfBlockage("Only allowed " + configuration.getNumberAllowedToRun() + " for:\n" + configuration.getCheckedValues());
 								}
 								break;
